@@ -26,6 +26,12 @@ services:
       # to manually edit configuration files and have the changes persist.
       V_RISING_APPLY_CUSTOM_SETTINGS: "1"
 
+      # Allows changing of internal container user's USER_ID and GROUP_ID so you can set them to match
+      # a local user to have permissions in bound directories for docker. Rootless podman does not need
+      # this changed as podman unshare is used for everything related to the bind volumes.
+      UID: 1000
+      GID: 1000
+
       # Customize the server
       V_RISING_SERVER_NAME: "V Rising Docker Test Server"
       V_RISING_SERVER_DESCRIPTION: "Test server."

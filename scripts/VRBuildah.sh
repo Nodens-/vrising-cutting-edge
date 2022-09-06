@@ -40,10 +40,15 @@ buildah config --port 9878/tcp $CONTAINER
 # Set Locale
 buildah run $CONTAINER localedef -f UTF-8 -i en_US en_US.UTF-8
 
+# UID/GID variables to allow changing from compose.
+buildah config --env UID=1000 $CONTAINER
+buildah config --env GID=1000 $CONTAINER
+
+
 # Add non-root user
-buildah run $CONTAINER groupadd -g 1000 vrserver
-buildah run $CONTAINER useradd -ms /bin/bash -u 1000 -g vrserver vrserver
-#buildah run $CONTAINER 'echo -e "LANG="en_US.utf8"\nexport LANG" > /home/vrserver/.bashrc'
+buildah run $CONTAINER groupadd -g $GID vrserver
+buildah run $CONTAINER useradd -ms /bin/bash -u $UID -g vrserver vrserver
+#buildah run $CONTAINER
 
 # Add update job
 buildah copy $CONTAINER scripts/jobber /home/vrserver/.jobber
@@ -56,11 +61,12 @@ buildah copy $CONTAINER scripts/update_check.sh /app/update_check.sh
 buildah copy $CONTAINER scripts/install.txt /app/install.txt
 
 # Create directories and fix permissions
-buildah run $CONTAINER mkdir -p /steamcmd/vrising /app/vrising /home/vrserver/.wine
+buildah run $CONTAINER mkdir -p /steamcmd/vrising /app/vrising /home/vrserver/.wine /var/jobber/$UID
 buildah run $CONTAINER chown -R vrserver:vrserver \
 	/steamcmd \
 	/app \
 	/home/vrserver \
+	/var/jobber/$UID \
 	/dev/stdout \
 	/dev/stderr
 buildah run $CONTAINER chmod 755 /usr/bin/rcon
@@ -72,7 +78,6 @@ buildah run $CONTAINER rm -rf /usr/lib/udev/hwdb.d/
 buildah run $CONTAINER rm -rf /boot
 buildah run $CONTAINER rm -rf /var/lib/dnf/history.*
 buildah run $CONTAINER rm -rf /usr/lib/locale/locale-archive*
-#buildah run $CONTAINER find /usr/share/locale/ \! -name '*en*' -exec rm -rf \{\} \;
 buildah run $CONTAINER rm -rf /var/cache/*
 buildah run $CONTAINER rm -rf /var/lib/rpm
 

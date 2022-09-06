@@ -8,7 +8,7 @@ For more information on all the configuration options look in [docker-compose.ym
 
 ## Build
 
-For mimimum size images (built with ```--squash-all``` for podman or ```--squash``` for docker) use [build-podman.sh](build-podman.sh) and [build-docker.sh](build-docker.sh) respectively. If you don't care about the extra size from layers just run ```podman-compose up -d``` or ```docker-compose up -d```.
+For mimimum size images (built with ```--squash-all``` for podman or ```--squash``` for docker) use [build-podman.sh](build-podman.sh) and [build-docker.sh](build-docker.sh) respectively. If you don't care about the extra size from layers just run ```podman-compose up -d``` or ```docker compose up -d```.
 
 ### Notes
 

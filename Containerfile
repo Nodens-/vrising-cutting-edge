@@ -48,10 +48,15 @@ EXPOSE 9876/udp
 EXPOSE 9877/udp
 EXPOSE 9878/tcp
 
+# UID/GID variables to allow changing from compose.
+ENV UID=1000
+ENV GID=1000
+
+
 # Add non-root user
-RUN groupadd -g 1000 vrserver \
-	&& useradd -ms /bin/bash -u 1000 -g vrserver vrserver \
-	&& mkdir -p /home/vrserver/.wine /var/jobber/1000 \
+RUN groupadd -g $GID vrserver \
+	&& useradd -ms /bin/bash -u $UID -g vrserver vrserver \
+	&& mkdir -p /home/vrserver/.wine /var/jobber/$UID \
 	&& echo -e "LANG="en_US.utf8"\nexport LANG" > /home/vrserver/.bashrc
 
 
@@ -78,8 +83,8 @@ RUN chown -R vrserver:vrserver \
 	&& chmod -R 775 /home/vrserver/.wine
 
 # Switch to vrserver user
-ENV USER_ID=1000
-ENV GROUP_ID=1000
+ENV USER_ID=$USERID
+ENV GROUP_ID=$GROUPID
 ENV USER_NAME=vrserver
 ENV GROUP_NAME=vrserver
 USER vrserver:vrserver
