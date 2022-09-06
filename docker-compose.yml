@@ -1,0 +1,73 @@
+version: 3
+services:
+
+  vrising:
+
+    image: localhost/vrising-cutting-edge:latest
+    build: .
+    container_name: vrising
+    stop_grace_period: 15s
+    # If using podman you should make a systemd unit file from the container and manage it that way.
+    # Podman supports automatic systemd unit file generation from a running container. Look it up.
+    restart: unless-stopped
+    # restart: "no"
+
+    environment:
+      # Configure the server
+      V_RISING_SERVER_PERSISTENT_DATA_PATH: "/app/vrising"
+      V_RISING_SERVER_BRANCH: "public" # Allows pulling a different branch of the server eg beta
+      # V_RISING_SERVER_START_MODE: "0" # Install/update and start server.
+      # V_RISING_SERVER_START_MODE: "1" # Install/update and exit
+      V_RISING_SERVER_START_MODE: "2" # Install, skip update check and start server
+      V_RISING_SERVER_AUTO_UPDATE: "1" # Enable hourly update checking. 0 to disable
+      V_RISING_INSTALL_MOD_SUPPORT: "1" # Enable installation of BepinEx mod support. 0 to disable
+
+      # Applies the customization settings below. Set to 0 after initial install if you want to be able
+      # to manually edit configuration files and have the changes persist.
+      V_RISING_APPLY_CUSTOM_SETTINGS: "1"
+
+      # Customize the server
+      V_RISING_SERVER_NAME: "V Rising Docker Test Server"
+      V_RISING_SERVER_DESCRIPTION: "Test server."
+      V_RISING_SERVER_GAME_PORT: 9876
+      V_RISING_SERVER_QUERY_PORT: 9877
+      V_RISING_SERVER_RCON_PORT: 9878
+      V_RISING_SERVER_RCON_ENABLED: true
+      V_RISING_SERVER_RCON_PASSWORD: "rcoon"
+      V_RISING_SERVER_MAX_CONNECTED_USERS: 1
+      V_RISING_SERVER_MAX_CONNECTED_ADMINS: 1
+      V_RISING_SERVER_SAVE_NAME: "test_server"
+      V_RISING_SERVER_PASSWORD: "Testiing"
+      V_RISING_SERVER_LIST_ON_MNASTER_SERVER: false
+      V_RISING_SERVER_AUTO_SAVE_COUNT: 5
+      V_RISING_SERVER_AUTO_SAVE_INTERVAL: 10
+      V_RISING_SERVER_GAME_SETTINGS_PRESET: "StandardPvE"
+
+    ports:
+      - "9876:9876/udp"
+      - "9877:9877/udp"
+      - "9878:9878/tcp"
+
+    volumes:
+      # SELinux systems and specially rootless podman require :z flag on the volume mounts.
+      # Remove if you are using docker WITHOUT SELinux.
+      # Also for rootless podman, when using bind mounts (the default) you need to create the
+      # 3 local directories and run "podman unshare chown -R 1000:1000 <directory>" before doing
+      # "podman-compose up -d".  For example with the defaults:
+      # podman unshare chown -R 1000:1000 ./vrising_saves
+      # podman unshare chown -R 1000:1000 ./vrising_data
+      # podman unshare chown -R 1000:1000 ./vrising_saves/.wine
+      # If you're not familiar with rootless podman I suggest reading the documentation, specially
+      # for podman unshare. If running the podman containers as root then unshare is not needed.
+      # But you shouldn't do that anyhow if you value podman's increased security over docker.
+
+      - ./vrising_saves:/app/vrising:z
+      - ./vrising_data:/steamcmd/vrising:z
+      - ./vrising_saves/.wine:/home/vrserver/.wine:z
+
+      # These are named volumes, in case you do not want the directories bound on the host for some
+      # reason.
+      # - vrising_saves:/app/vrising
+      # - vrising_data:/steamcmd/vrising
+      # - vrising_saves/.wine:/home/vrserver/.wine
+

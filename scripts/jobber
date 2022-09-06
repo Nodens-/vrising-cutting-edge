@@ -1,0 +1,6 @@
+version: 1.4
+
+jobs:
+  UpdateCheck:
+    cmd: /usr/bin/bash /app/update_check.sh
+    time: 0 0 * * * *
